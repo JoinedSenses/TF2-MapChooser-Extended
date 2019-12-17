@@ -37,7 +37,7 @@
 
 #include <sourcemod>
 #include <mapchooser>
-#include "include/mapchooser_extended"
+#include <mapchooser_extended>
 #include <nextmap>
 
 #define MCE_VERSION "1.10.0"
@@ -51,7 +51,7 @@ public Plugin myinfo = {
 };
 
 ConVar
-	g_Cvar_Needed
+	  g_Cvar_Needed
 	, g_Cvar_MinPlayers
 	, g_Cvar_InitialDelay
 	, g_Cvar_Interval
@@ -61,7 +61,7 @@ ConVar
 
 bool
 	// True if RTV loaded maps and is active.
-	g_CanRTV
+	  g_CanRTV
 	// True if RTV is available to players. Used to delay rtv votes.
 	, g_RTVAllowed
 	, g_Voted[MAXPLAYERS+1]
@@ -131,8 +131,8 @@ public void OnClientConnected(int client) {
 
 	g_Voted[client] = false;
 
-	g_Voters++;
-	g_VotesNeeded = RoundToFloor(float(g_Voters) * g_Cvar_Needed.FloatValue);
+	++g_Voters;
+	g_VotesNeeded = RoundToCeil(float(g_Voters) * g_Cvar_Needed.FloatValue);
 
 	return;
 }
@@ -143,21 +143,22 @@ public void OnClientDisconnect(int client) {
 	}
 
 	if (g_Voted[client]) {
+		g_Voted[client] = false;
 		g_Votes--;
 	}
 
 	g_Voters--;
 
-	g_VotesNeeded = RoundToFloor(float(g_Voters) * g_Cvar_Needed.FloatValue);
+	g_VotesNeeded = RoundToCeil(float(g_Voters) * g_Cvar_Needed.FloatValue);
 
 	if (!g_CanRTV) {
 		return;
 	}
 
 	if (g_Votes
-		&& g_Voters
-		&& g_Votes >= g_VotesNeeded
-		&& g_RTVAllowed
+	&& g_Voters
+	&& g_Votes >= g_VotesNeeded
+	&& g_RTVAllowed
 	) {
 		if (g_Cvar_RTVPostVoteAction.IntValue == 1 && HasEndOfMapVoteFinished()) {
 			return;
@@ -181,6 +182,7 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	if (!g_CanRTV || !client) {
 		return Plugin_Continue;
 	}
+
 	if (strcmp(sArgs, "rtv", false) == 0 || strcmp(sArgs, "rockthevote", false) == 0) {
 		ReplySource old = SetCmdReplySource(SM_REPLY_TO_CHAT);
 		
@@ -248,6 +250,7 @@ void StartRTV() {
 
 			g_RTVAllowed = false;
 		}
+
 		return;
 	}
 
