@@ -38,7 +38,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define MCE_VERSION "1.30.0"
+#define MCE_VERSION "1.31.0"
 
 public Plugin myinfo = {
 	name = "Map Nominations Extended",
@@ -332,6 +332,8 @@ int MapList_MenuHandler(Menu menu, MenuAction action, int param1, int param2) {
 			delete menu;
 		}
 	}
+
+	return 0;
 }
 
 public int Handler_MapSelectMenu(Menu menu, MenuAction action, int param1, int param2) {
@@ -486,7 +488,7 @@ int FindMatchingMaps(ArrayList mapList, ArrayList results, const char[] input){
 
 	for (int i = 0; i < map_count; i++) {
 		mapList.GetString(i, map, sizeof(map));
-		if (StrContains(map, input) != -1) {
+		if (StrContains(map, input, false) != -1) {
 			results.Push(i);
 			matches++;
 
